@@ -1,9 +1,11 @@
 package com.portfolio.backend.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
 @Entity
+@Table(name = "student")
 public class Student {
 
     @Id
@@ -17,17 +19,18 @@ public class Student {
     private String portfolioLink;
     private String status;
 
-    // ✅ Use StudentProject instead of Project
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<StudentProject> projects;
-
-    // ✅ Feedback list
-    @ElementCollection
+    // ✅ Fix lazy loading issue
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<String> feedback;
 
-    // Getters & Setters
+    // ✅ Fix lazy loading issue for projects
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private List<StudentProject> projects;
 
+    // Getters and Setters
     public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -47,9 +50,9 @@ public class Student {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public List<StudentProject> getProjects() { return projects; }
-    public void setProjects(List<StudentProject> projects) { this.projects = projects; }
-
     public List<String> getFeedback() { return feedback; }
     public void setFeedback(List<String> feedback) { this.feedback = feedback; }
+
+    public List<StudentProject> getProjects() { return projects; }
+    public void setProjects(List<StudentProject> projects) { this.projects = projects; }
 }
